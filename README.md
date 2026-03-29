@@ -6,8 +6,6 @@ RageType plays a unique sound for every key you press — and as you type faster
 
 > Inspired by [SlapMac](https://slapmymac.com) — but for **every platform**, and triggered by your actual typing fury.
 
-https://github.com/user-attachments/assets/demo-placeholder
-
 ---
 
 ## How it works
