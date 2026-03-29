@@ -11,3 +11,6 @@ dist/
 build/
 .DS_Store
 Thumbs.db
+RageType.spec
+dist/
+build/
