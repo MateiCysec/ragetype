@@ -46,7 +46,7 @@ Created a fun sound pack? We'd love to feature it!
 ## Development Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ragetype.git
+git clone https://github.com/MateiCysec/ragetype.git
 cd ragetype
 python3 -m pip install -r requirements.txt
 # Place test sounds in sounds/default/

@@ -30,7 +30,7 @@ https://github.com/user-attachments/assets/demo-placeholder
 
 ```bash
 # Clone
-git clone https://github.com/YOUR_USERNAME/ragetype.git
+git clone https://github.com/MateiCysec/ragetype.git
 cd ragetype
 
 # Install dependencies

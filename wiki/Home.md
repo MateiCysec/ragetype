@@ -14,6 +14,6 @@ Welcome to the RageType wiki! Here you'll find everything you need to get starte
 
 ## Quick Links
 
-- [Report a bug](https://github.com/YOUR_USERNAME/ragetype/issues/new)
-- [Request a feature](https://github.com/YOUR_USERNAME/ragetype/issues/new)
+- [Report a bug](https://github.com/MateiCysec/ragetype/issues/new)
+- [Request a feature](https://github.com/MateiCysec/ragetype/issues/new)
 - [Contributing guide](../CONTRIBUTING.md)
