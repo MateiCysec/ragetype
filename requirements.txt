@@ -1,2 +1,10 @@
+# Core
 pynput>=1.7.0
 pygame>=2.5.0
+
+# Tray mode (ragetype_tray.py)
+pystray>=0.19.0
+Pillow>=10.0.0
+
+# Build (optional — only needed for creating .exe)
+# pyinstaller>=6.0.0
