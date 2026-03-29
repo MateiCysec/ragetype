@@ -40,7 +40,7 @@ The dashboard (`dashboard.py`) runs a simple HTTP server on `127.0.0.1:8000` (lo
 
 If you find a security issue, please **do not open a public issue**. Instead:
 
-1. Email: [your-email@example.com]
+1. Email: [to-be-added@gmail.com]
 2. Or use GitHub's [private vulnerability reporting](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability)
 
 Please include:

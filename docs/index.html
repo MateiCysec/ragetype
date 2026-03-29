@@ -330,6 +330,103 @@
   }
   .copy-btn:hover { color: var(--white); border-color: #444; }
 
+  /* ── Download section ── */
+  .download-section {
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .download-section h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 400;
+    margin-bottom: 0.6rem;
+  }
+
+  .download-section .sub {
+    color: var(--dim);
+    font-size: 0.85rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .download-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    max-width: 740px;
+    margin: 0 auto 2rem;
+  }
+
+  .dl-card {
+    background: var(--black);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    transition: background 0.2s;
+  }
+  .dl-card:hover { background: #0d0d0d; }
+
+  .dl-card .dl-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .dl-card h3 { font-size: 0.85rem; margin-bottom: 0.5rem; }
+  .dl-card p { font-size: 0.65rem; color: var(--dim); margin-bottom: 1.2rem; line-height: 1.6; }
+
+  .btn-download {
+    display: inline-block;
+    background: var(--red);
+    color: var(--black);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.8em 2em;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: transform 0.1s;
+  }
+  .btn-download:hover { transform: scale(1.04); color: var(--black); }
+
+  .btn-download.secondary {
+    background: transparent;
+    color: var(--white);
+    border: 1px solid #333;
+  }
+  .btn-download.secondary:hover { border-color: var(--white); }
+
+  .privacy-note {
+    font-size: 0.65rem;
+    color: #333;
+    max-width: 500px;
+    margin: 2rem auto 0;
+    line-height: 1.7;
+    padding: 1rem;
+    border: 1px solid #1a1a1a;
+  }
+
+  .privacy-note strong { color: var(--dim); }
+
+  .dev-toggle {
+    margin-top: 3rem;
+    font-size: 0.7rem;
+    color: var(--dim);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    background: none;
+    border: none;
+    font-family: 'Space Mono', monospace;
+  }
+  .dev-toggle:hover { color: var(--white); }
+
+  .dev-install {
+    max-width: 620px;
+    margin: 2rem auto 0;
+    text-align: left;
+    display: none;
+  }
+  .dev-install.open { display: block; }
+
   /* ── Footer ── */
   footer {
     border-top: 1px solid var(--border);
@@ -359,8 +456,8 @@
     Every key has a sound. Type angry — it screams.
   </p>
   <div class="cta-row">
-    <a href="https://github.com/MateiCysec/ragetype" class="btn btn-primary">View on GitHub</a>
-    <a href="#install" class="btn btn-ghost">Install →</a>
+    <a href="#install" class="btn btn-primary">Download free</a>
+    <a href="https://github.com/MateiCysec/ragetype" class="btn btn-ghost">GitHub →</a>
   </div>
   <p class="note">Python 3.8+ &middot; Windows &middot; Linux &middot; macOS</p>
 </section>
@@ -443,25 +540,56 @@
   <div id="try-status">Waiting for input...</div>
 </section>
 
-<!-- INSTALL -->
-<section class="install" id="install">
-  <h2>Install in 30 seconds</h2>
-  <div class="code-block">
-    <button class="copy-btn" onclick="copyInstall()">Copy</button>
-    <span class="comment"># Clone the repo</span><br>
-    <span class="cmd">git clone https://github.com/MateiCysec/ragetype.git</span><br>
-    <span class="cmd">cd ragetype</span><br><br>
-    <span class="comment"># Install dependencies</span><br>
-    <span class="cmd">python3 -m pip install -r requirements.txt</span><br><br>
-    <span class="comment"># Add your sounds (a.mp3 ... z.mp3, 0.mp3 ... 9.mp3)</span><br>
-    <span class="comment"># into sounds/default/</span><br><br>
-    <span class="comment"># Run it</span><br>
-    <span class="cmd">python3 ragetype.py</span>
+<!-- DOWNLOAD -->
+<section class="download-section" id="install">
+  <h2>Get RageType</h2>
+  <p class="sub">Free. No account needed. Just download and rage.</p>
+
+  <div class="download-cards">
+    <div class="dl-card">
+      <div class="dl-icon">🪟</div>
+      <h3>Windows</h3>
+      <p>Standalone .exe — no Python needed.<br>Windows 10/11, 64-bit.</p>
+      <a href="https://github.com/MateiCysec/ragetype/releases/latest/download/RageType-Windows.zip" class="btn-download">Download .exe</a>
+    </div>
+    <div class="dl-card">
+      <div class="dl-icon">🐧</div>
+      <h3>Linux</h3>
+      <p>Clone &amp; run with Python 3.8+.<br>X11 &amp; Wayland (XWayland).</p>
+      <a href="https://github.com/MateiCysec/ragetype" class="btn-download secondary">View on GitHub</a>
+    </div>
+    <div class="dl-card">
+      <div class="dl-icon">🍎</div>
+      <h3>macOS</h3>
+      <p>Clone &amp; run with Python 3.8+.<br>Needs Accessibility permission.</p>
+      <a href="https://github.com/MateiCysec/ragetype" class="btn-download secondary">View on GitHub</a>
+    </div>
   </div>
-  <div class="code-block">
-    <span class="comment"># Optional: launch the dashboard</span><br>
-    <span class="cmd">python3 dashboard.py</span><br>
-    <span class="comment"># Open http://localhost:8000</span>
+
+  <div class="privacy-note">
+    <strong>🔒 100% Local.</strong> RageType never connects to the internet. No telemetry, no accounts, no cloud. Your keystrokes stay on your machine. <a href="https://github.com/MateiCysec/ragetype/blob/main/SECURITY.md" style="color:var(--dim);">Read our security policy →</a>
+  </div>
+
+  <button class="dev-toggle" onclick="document.querySelector('.dev-install').classList.toggle('open'); this.textContent = this.textContent.includes('Developer') ? 'Hide developer install ↑' : 'Developer install (Python) ↓'">Developer install (Python) ↓</button>
+
+  <div class="dev-install">
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyInstall()">Copy</button>
+      <span class="comment"># Clone the repo</span><br>
+      <span class="cmd">git clone https://github.com/MateiCysec/ragetype.git</span><br>
+      <span class="cmd">cd ragetype</span><br><br>
+      <span class="comment"># Install dependencies</span><br>
+      <span class="cmd">python3 -m pip install -r requirements.txt</span><br><br>
+      <span class="comment"># Add your sounds (a.mp3 ... z.mp3, 0.mp3 ... 9.mp3)</span><br>
+      <span class="comment"># into sounds/default/</span><br><br>
+      <span class="comment"># Run it</span><br>
+      <span class="cmd">python3 ragetype.py</span>
+    </div>
+    <div class="code-block">
+      <span class="comment"># Optional: launch the dashboard</span><br>
+      <span class="cmd">python3 dashboard.py</span><br>
+      <span class="comment"># Open http://localhost:8000</span>
+    </div>
   </div>
 </section>
 
