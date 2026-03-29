@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+.venv
+venv/
+config.json
+sounds/custom/
+*.egg-info/
+dist/
+build/
+.DS_Store
+Thumbs.db

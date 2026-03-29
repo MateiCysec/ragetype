@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RageType — Your keyboard fights back.</title>
+<meta name="description" content="RageType detects your angry typing and fights back with sound effects. The harder you type, the louder it screams. Free, open source, cross-platform.">
+<meta property="og:title" content="RageType — Your keyboard fights back.">
+<meta property="og:description" content="Detects angry typing. Plays escalating sound effects. Free & open source.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f0ebe4;
+    --red: #ff2d2d;
+    --orange: #ff6b35;
+    --yellow: #ffd23f;
+    --green: #4ecdc4;
+    --purple: #c77dff;
+    --dim: #555;
+    --surface: #111;
+    --border: #1a1a1a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    overflow-x: hidden;
+  }
+
+  /* Grain */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  a { color: var(--white); }
+
+  /* ── Hero ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--dim);
+    border: 1px solid #282828;
+    padding: 0.5em 1.8em;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(4rem, 11vw, 10rem);
+    font-weight: 400;
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    margin-bottom: 1.2rem;
+  }
+
+  .hero h1 .rage {
+    color: var(--red);
+    font-style: italic;
+    display: inline-block;
+    transition: transform 0.05s;
+  }
+
+  .hero h1 .rage.shaking {
+    animation: shake 0.12s infinite;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translate(0) rotate(0); }
+    20% { transform: translate(-3px, 2px) rotate(-1.5deg); }
+    40% { transform: translate(2px, -1px) rotate(1deg); }
+    60% { transform: translate(-2px, 1px) rotate(-0.5deg); }
+    80% { transform: translate(3px, -2px) rotate(1.5deg); }
+  }
+
+  .hero-sub {
+    font-size: clamp(0.95rem, 2.2vw, 1.3rem);
+    color: var(--dim);
+    max-width: 480px;
+    line-height: 1.7;
+    margin-bottom: 3rem;
+  }
+
+  .hero-sub em { color: var(--white); font-style: normal; }
+
+  .cta-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 1em 2.2em;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.1s;
+    display: inline-block;
+  }
+  .btn:hover { transform: scale(1.04); }
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary { background: var(--red); color: var(--black); }
+  .btn-ghost { background: transparent; color: var(--white); border: 1px solid #333; }
+  .btn-ghost:hover { border-color: var(--white); }
+
+  .note {
+    margin-top: 1.2rem;
+    font-size: 0.7rem;
+    color: #333;
+  }
+
+  /* ── Ticker ── */
+  .ticker {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 0.9rem 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .ticker-track {
+    display: inline-flex;
+    animation: marquee 25s linear infinite;
+  }
+
+  .ticker-item {
+    padding: 0 2.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .ticker-item .dot { color: var(--red); margin-right: 0.8rem; }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ── Rage meter ── */
+  .section { max-width: 880px; margin: 0 auto; padding: 5rem 2rem; }
+  .section-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 2.5rem;
+  }
+
+  .meter-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 90px;
+    align-items: center;
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid #141414;
+    gap: 1.5rem;
+    transition: background 0.2s;
+  }
+  .meter-row:hover { background: #0e0e0e; }
+
+  .meter-name { font-weight: 700; font-size: 0.8rem; letter-spacing: 0.04em; }
+  .meter-track { height: 3px; background: #141414; border-radius: 2px; overflow: hidden; }
+  .meter-fill { height: 100%; border-radius: 2px; }
+  .meter-hint { font-size: 0.65rem; color: var(--dim); text-align: right; }
+
+  .meter-row:nth-child(1) .meter-name { color: var(--green); }
+  .meter-row:nth-child(1) .meter-fill { background: var(--green); width: 12%; }
+  .meter-row:nth-child(2) .meter-name { color: var(--yellow); }
+  .meter-row:nth-child(2) .meter-fill { background: var(--yellow); width: 28%; }
+  .meter-row:nth-child(3) .meter-name { color: var(--orange); }
+  .meter-row:nth-child(3) .meter-fill { background: var(--orange); width: 48%; }
+  .meter-row:nth-child(4) .meter-name { color: #ff4444; }
+  .meter-row:nth-child(4) .meter-fill { background: #ff4444; width: 68%; }
+  .meter-row:nth-child(5) .meter-name { color: var(--red); }
+  .meter-row:nth-child(5) .meter-fill { background: var(--red); width: 85%; }
+  .meter-row:nth-child(6) .meter-name { color: var(--purple); animation: pulse 0.6s infinite; }
+  .meter-row:nth-child(6) .meter-fill { background: linear-gradient(90deg, var(--red), var(--purple)); width: 100%; }
+
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ── Features ── */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .feat {
+    background: var(--black);
+    padding: 2.2rem;
+    transition: background 0.2s;
+  }
+  .feat:hover { background: #0d0d0d; }
+
+  .feat-icon { font-size: 1.6rem; margin-bottom: 1rem; }
+  .feat h3 { font-size: 0.78rem; margin-bottom: 0.6rem; letter-spacing: 0.03em; }
+  .feat p { font-size: 0.68rem; color: var(--dim); line-height: 1.75; }
+
+  /* ── Try it ── */
+  .try-section {
+    text-align: center;
+    padding: 6rem 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .try-section h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 400;
+    margin-bottom: 0.7rem;
+  }
+
+  .try-section .hint {
+    color: var(--dim);
+    font-size: 0.8rem;
+    margin-bottom: 2rem;
+  }
+
+  #try-input {
+    background: var(--surface);
+    border: 2px solid #1e1e1e;
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    padding: 1.4rem 2rem;
+    width: 100%;
+    max-width: 620px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  #try-input::placeholder { color: #333; }
+  #try-input:focus { border-color: #333; }
+
+  #try-input.l1 { border-color: var(--green); box-shadow: 0 0 25px rgba(78,205,196,0.08); }
+  #try-input.l2 { border-color: var(--yellow); box-shadow: 0 0 25px rgba(255,210,63,0.12); }
+  #try-input.l3 { border-color: var(--orange); box-shadow: 0 0 30px rgba(255,107,53,0.16); }
+  #try-input.l4 { border-color: #ff4444; box-shadow: 0 0 35px rgba(255,68,68,0.2); }
+  #try-input.l5 { border-color: var(--red); box-shadow: 0 0 40px rgba(255,45,45,0.25); animation: inputShake 0.1s infinite; }
+  #try-input.l6 { border-color: var(--purple); box-shadow: 0 0 50px rgba(199,125,255,0.3); animation: inputShake 0.07s infinite; }
+
+  @keyframes inputShake {
+    0%,100% { transform: translate(0); }
+    25% { transform: translate(-2px, 1px); }
+    75% { transform: translate(2px, -1px); }
+  }
+
+  #try-status {
+    font-size: 0.8rem;
+    color: var(--dim);
+    margin-top: 1rem;
+    min-height: 1.5em;
+  }
+
+  /* ── Install block ── */
+  .install {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+    text-align: left;
+  }
+
+  .install h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    font-size: 0.78rem;
+    line-height: 1.9;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .code-block .comment { color: #444; }
+  .code-block .cmd { color: var(--green); }
+
+  .copy-btn {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.8rem;
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    color: var(--dim);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    padding: 0.3em 0.8em;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .copy-btn:hover { color: var(--white); border-color: #444; }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    font-size: 0.6rem;
+    color: #2a2a2a;
+    letter-spacing: 0.08em;
+  }
+  footer a { color: var(--dim); text-decoration: none; }
+  footer a:hover { color: var(--white); }
+
+  @media (max-width: 600px) {
+    .meter-row { grid-template-columns: 90px 1fr 60px; padding: 0.9rem 1rem; gap: 1rem; }
+    .meter-name { font-size: 0.65rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">Free &middot; Open Source &middot; Cross-Platform</div>
+  <h1><span class="rage" id="rage-word">Rage</span>Type</h1>
+  <p class="hero-sub">
+    Your keyboard <em>fights back</em>.<br>
+    Every key has a sound. Type angry — it screams.
+  </p>
+  <div class="cta-row">
+    <a href="https://github.com/YOUR_USERNAME/ragetype" class="btn btn-primary">View on GitHub</a>
+    <a href="#install" class="btn btn-ghost">Install →</a>
+  </div>
+  <p class="note">Python 3.8+ &middot; Windows &middot; Linux &middot; macOS</p>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item"><span class="dot">●</span> 36 individual key sounds (a-z, 0-9)</span>
+    <span class="ticker-item"><span class="dot">●</span> 6 escalating rage levels</span>
+    <span class="ticker-item"><span class="dot">●</span> Local dashboard to swap sounds</span>
+    <span class="ticker-item"><span class="dot">●</span> Upload your own MP3s per key</span>
+    <span class="ticker-item"><span class="dot">●</span> Lifetime meltdown counter</span>
+    <span class="ticker-item"><span class="dot">●</span> Adjustable sensitivity</span>
+    <span class="ticker-item"><span class="dot">●</span> Zero cloud. 100% local.</span>
+    <span class="ticker-item"><span class="dot">●</span> 36 individual key sounds (a-z, 0-9)</span>
+    <span class="ticker-item"><span class="dot">●</span> 6 escalating rage levels</span>
+    <span class="ticker-item"><span class="dot">●</span> Local dashboard to swap sounds</span>
+    <span class="ticker-item"><span class="dot">●</span> Upload your own MP3s per key</span>
+    <span class="ticker-item"><span class="dot">●</span> Lifetime meltdown counter</span>
+    <span class="ticker-item"><span class="dot">●</span> Adjustable sensitivity</span>
+    <span class="ticker-item"><span class="dot">●</span> Zero cloud. 100% local.</span>
+  </div>
+</div>
+
+<!-- RAGE LEVELS -->
+<section class="section">
+  <div class="section-label">Rage levels</div>
+  <div>
+    <div class="meter-row"><div class="meter-name">😌 CALM</div><div class="meter-track"><div class="meter-fill"></div></div><div class="meter-hint">quiet</div></div>
+    <div class="meter-row"><div class="meter-name">😤 ANNOYED</div><div class="meter-track"><div class="meter-fill"></div></div><div class="meter-hint">~4 k/s</div></div>
+    <div class="meter-row"><div class="meter-name">😠 FRUSTRATED</div><div class="meter-track"><div class="meter-fill"></div></div><div class="meter-hint">~7 k/s</div></div>
+    <div class="meter-row"><div class="meter-name">🤬 ANGRY</div><div class="meter-track"><div class="meter-fill"></div></div><div class="meter-hint">~11 k/s</div></div>
+    <div class="meter-row"><div class="meter-name">💢 RAGE</div><div class="meter-track"><div class="meter-fill"></div></div><div class="meter-hint">~16 k/s</div></div>
+    <div class="meter-row"><div class="meter-name">☢️ MELTDOWN</div><div class="meter-track"><div class="meter-fill"></div></div><div class="meter-hint">~22 k/s</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="section-label">Features</div>
+  <div class="features">
+    <div class="feat">
+      <div class="feat-icon">🎹</div>
+      <h3>Per-Key Sounds</h3>
+      <p>Every letter and digit gets its own MP3. Not random — intentional. Each key has character.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">📊</div>
+      <h3>Rage Analytics</h3>
+      <p>Real-time keys/sec, peak speed, total keystrokes, and a lifetime meltdown counter.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🎛️</div>
+      <h3>Web Dashboard</h3>
+      <p>Local web UI to preview, upload, and swap MP3s for any key. No terminal needed.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">📦</div>
+      <h3>Sound Packs</h3>
+      <p>Swap entire sound sets: piano keys, cat meows, drum hits, retro bleeps. Just drop in 36 MP3s.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🖥️</div>
+      <h3>Cross-Platform</h3>
+      <p>Windows, Linux, macOS. Pure Python. Two dependencies. No Electron, no browser, no bloat.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🔓</div>
+      <h3>Open Source</h3>
+      <p>MIT licensed. Read the code. Fork it. Ship your own version. We don't care (in a good way).</p>
+    </div>
+  </div>
+</section>
+
+<!-- TRY IT -->
+<section class="try-section">
+  <h2>Try the rage detector</h2>
+  <p class="hint">Start typing. Get angry. Watch what happens.</p>
+  <input type="text" id="try-input" placeholder="Type something furious..." autocomplete="off" spellcheck="false">
+  <div id="try-status">Waiting for input...</div>
+</section>
+
+<!-- INSTALL -->
+<section class="install" id="install">
+  <h2>Install in 30 seconds</h2>
+  <div class="code-block">
+    <button class="copy-btn" onclick="copyInstall()">Copy</button>
+    <span class="comment"># Clone the repo</span><br>
+    <span class="cmd">git clone https://github.com/MateiCysec/ragetype.git</span><br>
+    <span class="cmd">cd ragetype</span><br><br>
+    <span class="comment"># Install dependencies</span><br>
+    <span class="cmd">python3 -m pip install -r requirements.txt</span><br><br>
+    <span class="comment"># Add your sounds (a.mp3 ... z.mp3, 0.mp3 ... 9.mp3)</span><br>
+    <span class="comment"># into sounds/default/</span><br><br>
+    <span class="comment"># Run it</span><br>
+    <span class="cmd">python3 ragetype.py</span>
+  </div>
+  <div class="code-block">
+    <span class="comment"># Optional: launch the dashboard</span><br>
+    <span class="cmd">python3 dashboard.py</span><br>
+    <span class="comment"># Open http://localhost:8000</span>
+  </div>
+</section>
+
+<footer>
+  RageType &copy; 2026 &nbsp;&middot;&nbsp;
+  <a href="https://github.com/MateiCysec/ragetype">GitHub</a> &nbsp;&middot;&nbsp;
+  MIT License &nbsp;&middot;&nbsp;
+  No keyboards were harmed (probably)
+</footer>
+
+<script>
+  // ── Interactive demo ──
+  const input = document.getElementById('try-input');
+  const status = document.getElementById('try-status');
+  const rageWord = document.getElementById('rage-word');
+  const times = [];
+  const levels = [
+    { t: 0, cls: 'l1', msg: 'Waiting for input...' },
+    { t: 4, cls: 'l2', msg: 'Getting warm...' },
+    { t: 7, cls: 'l3', msg: 'The frustration builds...' },
+    { t: 11, cls: 'l4', msg: 'Anger detected!' },
+    { t: 16, cls: 'l5', msg: 'KEYBOARD ABUSE IN PROGRESS' },
+    { t: 22, cls: 'l6', msg: '☢ TOTAL MELTDOWN ☢' },
+  ];
+
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  let lastSound = 0;
+
+  function beep(lvl) {
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    const now = audioCtx.currentTime;
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(180 + lvl * 140, now);
+    osc.frequency.exponentialRampToValueAtTime(100 + lvl * 60, now + 0.15);
+    osc.type = lvl > 3 ? 'sawtooth' : 'sine';
+    g.gain.setValueAtTime(0.06 + lvl * 0.025, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.12 + lvl * 0.04);
+    osc.start(now); osc.stop(now + 0.18 + lvl * 0.04);
+  }
+
+  input.addEventListener('keydown', () => {
+    const now = Date.now();
+    times.push(now);
+    while (times.length && now - times[0] > 2000) times.shift();
+    if (times.length < 2) return;
+    const kps = times.length / ((now - times[0]) / 1000);
+    let cur = 0;
+    for (let i = 0; i < levels.length; i++) if (kps >= levels[i].t) cur = i;
+    input.className = levels[cur].cls;
+    const display = cur === 0
+      ? levels[0].msg
+      : kps.toFixed(1) + ' keys/sec — ' + levels[cur].msg;
+    status.textContent = display;
+    status.style.color = cur > 3 ? 'var(--red)' : cur > 1 ? 'var(--orange)' : 'var(--dim)';
+
+    rageWord.classList.toggle('shaking', cur >= 4);
+
+    if (cur >= 1 && now - lastSound > 180) { beep(cur); lastSound = now; }
+  });
+
+  let idle;
+  input.addEventListener('keydown', () => {
+    clearTimeout(idle);
+    idle = setTimeout(() => {
+      input.className = '';
+      status.textContent = levels[0].msg;
+      status.style.color = 'var(--dim)';
+      rageWord.classList.remove('shaking');
+    }, 2500);
+  });
+
+  function copyInstall() {
+    const text = 'git clone https://github.com/MateiCysec/ragetype.git\ncd ragetype\npython3 -m pip install -r requirements.txt\npython3 ragetype.py';
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  }
+</script>
+</body>
+</html>
